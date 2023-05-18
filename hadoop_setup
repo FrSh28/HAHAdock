@@ -14,8 +14,6 @@
     * To start: `sbin/start-yarn.sh`
     * To stop : `sbin/stop-yarn.sh`
 
-* `yarn.resourcemanager.hostname`: namenode hostname
-
 ## Prerequisite
 
 * ``apt-get install -y openssh-server``
@@ -45,7 +43,6 @@
 
 * Edit `$HADOOP_HOME/etc/hadoop/core-site.xml`
     * `fs.defaultFS`: `hdfs://{namenode-hostname}:9000`
-    * (NameNode) `hadoop.security.key.provider.path`: `kms://http@{key-provider-hostname}:9600/kms`
 * Edit `$HADOOP_HOME/etc/hadoop/hdfs-site.xml`
     * `dfs.replication`: `{number of data replication}`
     * (NameNode) `dfs.namenode.name.dir`: `~/hdfs/name`
@@ -66,7 +63,7 @@
     * (KMS) `hadoop.kms.http.port`: `9600`
     * (KMS) `hadoop.kms.http.host`: `{bind host for KMS REST API}`
     * (KMS) `hadoop.kms.key.provider.uri`: `jceks://file@/${user.home}/kms.keystore`
-    * (KMS) `hadoop.security.keystore.java-keystore-provider.password-file`: `{file name for the keystore password, e.g.kms.keystore.password}`
+    * (KMS) `hadoop.security.keystore.java-keystore-provider.password-file`: `{file name for the keystore password, e.g. kms.keystore.password, placed under $HADOOP_HOME/etc/hadoop/}`
 
 ## Starting Hadoop DFS with KMS
 
