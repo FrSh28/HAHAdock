@@ -1,0 +1,84 @@
+# Set Up with KMS
+
+* DO NOT use root (sudo) to generate ssh keys
+* Make sure `hadoop/logs` is writable
+* Hadoop web UI: hostname:9870
+* Yarn web UI: hostname:8088
+* ssh-server
+    * To start: `sudo service ssh start`
+    * To stop : `sudo service ssh stop`
+* hdfs
+    * To start: `sbin/start-dfs.sh`
+    * To stop : `sbin/stop-dfs.sh`
+* yarn
+    * To start: `sbin/start-yarn.sh`
+    * To stop : `sbin/stop-yarn.sh`
+
+* `yarn.resourcemanager.hostname`: namenode hostname
+
+## Prerequisite
+
+* ``apt-get install -y openssh-server``
+* ``apt-get install -y openjdk-8-jdk``
+    * Set env: `JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64`
+* (NameNode) ``makdir -p ~/hdfs/name``
+* (DataNode) ``mkdir -p ~/hdfs/data``
+
+## Generate Public/Private Key Pair
+
+* (NameNode) ``ssh-keygen -t rsa -f ~/.ssh/id_rsa -P ""``
+* (NameNode) ``cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys``
+* Copy `/root/.ssh/authorized_keys` to host machine
+* (DataNode) Copy `authorized_keys` to `~/.ssh/authorized_keys`
+* ``chmod 0600 ~/.ssh/authorized_keys``
+
+## Install Hadoop
+
+* Download hadoop from [hadoop-3.3.5.tar.gz](https://dlcdn.apache.org/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz)
+    * ``wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz``
+* ``tar -zxvf hadoop-3.3.5.tar.gz -C /opt``
+    * ``rm hadoop-3.3.5.tar.gz``
+* Set env: `HADDOP_HOME=/opt/hadoop-3.3.5`
+* Set env: `PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin`
+
+## Config Hadoop
+
+* Edit `$HADOOP_HOME/etc/hadoop/core-site.xml`
+    * `fs.defaultFS`: `hdfs://{namenode-hostname}:9000`
+    * (NameNode) `hadoop.security.key.provider.path`: `kms://http@{key-provider-hostname}:9600/kms`
+* Edit `$HADOOP_HOME/etc/hadoop/hdfs-site.xml`
+    * `dfs.replication`: `{number of data replication}`
+    * (NameNode) `dfs.namenode.name.dir`: `~/hdfs/name`
+    * (DataNode) `dfs.datanode.data.dir`: `~/hdfs/data`
+* Edit `$HADOOP_HOME/etc/hadoop/mapred-site.xml`
+    * `mapreduce.framework.name`: `yarn`
+* Edit `$HADOOP_HOME/etc/hadoop/yarn-site.xml`
+    * `yarn.nodemanager.aux-services`: `mapreduce_shuffle`
+    * `yarn.resourcemanager.hostname`: `{namenode-hostname}`
+* Edit `$HADOOP_HOME/etc/hadoop/workers`
+    * (NameNode) lines of slaves' hostname/IP
+
+### Config KMS
+
+* Edit `$HADOOP_HOME/etc/hadoop/core-site.xml`
+    * (NameNode) `hadoop.security.key.provider.path`: `kms://http@{key-provider-hostname}:9600/kms`
+* Edit `$HADOOP_HOME/etc/hadoop/kms-site.xml`
+    * (KMS) `hadoop.kms.http.port`: `9600`
+    * (KMS) `hadoop.kms.http.host`: `{bind host for KMS REST API}`
+    * (KMS) `hadoop.kms.key.provider.uri`: `jceks://file@/${user.home}/kms.keystore`
+    * (KMS) `hadoop.security.keystore.java-keystore-provider.password-file`: `{file name for the keystore password, e.g.kms.keystore.password}`
+
+## Starting Hadoop DFS with KMS
+
+### HDFS
+
+* Execute the following on NameNode
+* ``hdfs namenode -format``
+<!-- * ``chmod +x $HADOOP_HOME/sbin/start-*.sh`` -->
+* ``start-dfs.sh``
+* ``start-yarn.sh``
+
+### KMS
+
+* Can be on a seperate machine
+* ``hadoop --daemon start kms``
