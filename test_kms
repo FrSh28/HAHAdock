@@ -1,0 +1,11 @@
+# Test KMS
+
+hadoop key create my_ezk
+// hadoop key list -metadata
+
+hadoop fs -mkdir /enc_zone
+hdfs crypto -createZone -keyName my_ezk -path /enc_zone
+
+hadoop fs -put test.txt /enc_zone
+// hadoop -getFileEncryptionInfo -path /enc_zone/test.txt
+hadoop fs -cat /enc_zone/test.txt

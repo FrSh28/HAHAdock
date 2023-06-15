@@ -17,10 +17,10 @@ chmod 0600 ~/.ssh/authorized_keys
 service ssh start
 
 ## only on namenode
-mkdir -p ~/hdfs/name
+mkdir -p ~/hdfs/namenode
 ## end
 ## only on datanode
-mkdir -p ~/hdfs/data
+mkdir -p ~/hdfs/datanode
 ## end
 
 wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz

@@ -58,10 +58,10 @@
 ### Config KMS
 
 * Edit `$HADOOP_HOME/etc/hadoop/core-site.xml`
-    * (NameNode) `hadoop.security.key.provider.path`: `kms://http@{key-provider-hostname}:9600/kms`
+    * (NameNode) `hadoop.security.key.provider.path`: `kms://http@key-provider-hostname}:9600/kms`
 * Edit `$HADOOP_HOME/etc/hadoop/kms-site.xml`
-    * (KMS) `hadoop.kms.http.port`: `9600`
-    * (KMS) `hadoop.kms.http.host`: `{bind host for KMS REST API}`
+    * `hadoop.kms.http.port`: `9600`
+    * `hadoop.kms.http.host`: `{bind host for KMS REST API}`
     * (KMS) `hadoop.kms.key.provider.uri`: `jceks://file@/${user.home}/kms.keystore`
     * (KMS) `hadoop.security.keystore.java-keystore-provider.password-file`: `{file name for the keystore password, e.g. kms.keystore.password, placed under $HADOOP_HOME/etc/hadoop/}`
 

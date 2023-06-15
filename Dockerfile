@@ -1,28 +1,35 @@
-# 使用基础镜像
 FROM ubuntu:18.04
 
-# 设置环境变量
-ENV HADOOP_HOME=/opt/hadoop
-ENV PATH=$PATH:$HADOOP_HOME/bin
+WORKDIR /root
 
-# 安装 Java
-RUN apt-get update && apt-get install -y openjdk-8-jdk
+RUN apt-get update && apt-get install -y openssh-server openjdk-8-jdk wget
+RUN wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz && \
+    tar -xzvf hadoop-3.3.5.tar.gz -C /opt && \
+    rm hadoop-3.3.5.tar.gz
 
-# 复制 Hadoop 相关文件到容器
-COPY hadoop /opt/hadoop
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV HADOOP_HOME=/opt/hadoop-3.3.5
+ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 
-# 运行脚本以配置 Hadoop
-RUN chmod +x /opt/hadoop/hadoop_setup.sh
-RUN /opt/hadoop/hadoop_setup.sh
+ENV HDFS_NAMENODE_USER=root \
+    HDFS_DATANODE_USER=root \
+    HDFS_SECONDARYNAMENODE_USER=root \
+    YARN_RESOURCEMANAGER_USER=root \
+    YARN_NODEMANAGER_USER=root
 
-# 安装和配置 Hadoop
-RUN cd $HADOOP_HOME && \
-    # 配置 Hadoop 环境变量
-    echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> etc/hadoop/hadoop-env.sh && \
-    # 其他配置步骤...
+COPY config/ tmp/
 
-# 暴露 Hadoop 端口
-EXPOSE 8088 50070
+RUN mkdir -p ~/hdfs/namenode && \
+    mkdir -p ~/hdfs/datanode && \
+    mkdir -p ~/.ssh && \
+    mv ~/tmp/.ssh/* ~/.ssh/ && \
+    mv ~/tmp/hadoop/* $HADOOP_HOME/etc/hadoop && \
+    rm -rf ~/tmp
 
-# 设置容器启动时的默认命令
-CMD ["hadoop", "version"]
+RUN chmod 0600 ~/.ssh/* && \
+    chmod 0600 $HADOOP_HOME/etc/hadoop/kms.keystore.password && \
+    chmod +x $HADOOP_HOME/sbin/start-dfs.sh && \
+    chmod +x $HADOOP_HOME/sbin/start-yarn.sh 
+
+
+CMD [ "sh", "-c", "service ssh start; bash"]

@@ -21,12 +21,12 @@
 		<name>dfs.replication</name>
 		<value>3</value>
 	</property>
-  <property>
+	<property>
 		<name>dfs.namenode.name.dir</name>
-		<value>~/hdfs/name</value>
+		<value>~/hdfs/namenode</value>
 	</property>
-  <property>
+	<property>
 		<name>dfs.namenode.data.dir</name>
-		<value>~/hdfs/data</value>
+		<value>~/hdfs/datanode</value>
 	</property>
 </configuration>
