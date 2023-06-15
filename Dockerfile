@@ -19,9 +19,9 @@ ENV HDFS_NAMENODE_USER=root \
 
 COPY config/ tmp/
 
-RUN mkdir -p ~/hdfs/namenode && \
-    mkdir -p ~/hdfs/datanode && \
-    mkdir -p ~/.ssh && \
+# RUN mkdir -p ~/hdfs/namenode && \
+#     mkdir -p ~/hdfs/datanode && \
+RUN mkdir -p ~/.ssh && \
     mv ~/tmp/.ssh/* ~/.ssh/ && \
     mv ~/tmp/hadoop/* $HADOOP_HOME/etc/hadoop && \
     rm -rf ~/tmp

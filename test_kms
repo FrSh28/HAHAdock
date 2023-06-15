@@ -1,5 +1,7 @@
 # Test KMS
 
+docker exec -it hadoop-master /bin/bash
+
 hadoop key create my_ezk
 // hadoop key list -metadata
 
